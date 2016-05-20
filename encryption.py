@@ -69,11 +69,9 @@ def find_inverse(x, mod):
     """Find the inverse of x in mod 'mod' - e.g. 3^-1 in F_31 is -10 or 21"""
     for i in itertools.count(start=1):
         if (i * x) % mod == 0:
-            raise ArithmeticError("An inverse does not exist since 'x' and 'mod' are not coprime.")
+            return -1
         elif (i * x) % mod == 1:
             return i
-        elif i == 10**9: # Some arbitrary upper bound
-            return -1
 
 def inverse_2x2_matrix(matrix, mod):
     inv_matrix = matrix.copy()
@@ -82,3 +80,4 @@ def inverse_2x2_matrix(matrix, mod):
     inv_matrix[1,0] *= -1
     det_inv = find_inverse(int(det(matrix)), mod)
     return (det_inv * inv_matrix) % mod
+

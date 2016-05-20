@@ -52,6 +52,10 @@ class testEncryption(unittest.TestCase):
         inv = encryption.find_inverse(15,29)
         self.assertEqual(inv, 2)
 
+    def test_find_inverse_negative(self):
+        inv = encryption.find_inverse(2,6)
+        self.assertEqual(inv, -1)
+
     def test_affine_decrypt(self):
         K = np.array([[5,5],[5,8]])
         L, M = [9,2], [20,12]
