@@ -11,13 +11,11 @@ import numpy as np
 from numpy.linalg import det
 
 """Standard alphanumeric conversion dictionaries (tables) for mod 26 and mod 29"""
-ALPHABET_MOD26 = ''.join([chr(i) for i in xrange(65,91)]) # 'A' starts at index 65 in ASCII in Python
-NUMS_TO_ALPHABET_MOD26 = {i: ALPHABET_MOD26[i] for i in xrange(26)}
-ALPHABET_TO_NUMS_MOD26 = dict([(v, k) for k, v in NUMS_TO_ALPHABET_MOD26.iteritems()])
+NUMS_TO_ALPHABET_MOD26 = ''.join([chr(i) for i in xrange(65,91)]) # 'A' starts at index 65 in ASCII in Python
+ALPHABET_TO_NUMS_MOD26 = dict([(l, k) for k, l in enumerate(NUMS_TO_ALPHABET_MOD26)])
 
-ALPHABET_MOD29 = ''.join([chr(i) for i in xrange(65,91)])+'_?!'
-NUMS_TO_ALPHABET_MOD29 = {i: ALPHABET_MOD29[i] for i in xrange(29)}
-ALPHABET_TO_NUMS_MOD29 = dict([(v, k) for k, v in NUMS_TO_ALPHABET_MOD29.iteritems()])
+NUMS_TO_ALPHABET_MOD29 = ''.join([chr(i) for i in xrange(65,91)])+'_?!'
+ALPHABET_TO_NUMS_MOD29 = dict([(l, k) for k, l in enumerate(NUMS_TO_ALPHABET_MOD29)])
 
 def convert_message(m, table, reverse=False):
     """Converts a numeric message m into its alphabetical representation. table is
@@ -26,8 +24,6 @@ def convert_message(m, table, reverse=False):
     then converts an alphabetical message back to its numeric encoding instead."""
     
     if not reverse:
-        if not isinstance(table.keys()[0], int):
-            raise TypeError("Wrong type of conversion dictionary supplied.")
         message_in_letters = ''.join([table[l] for l in m])
         return message_in_letters
     else:
@@ -80,4 +76,3 @@ def inverse_2x2_matrix(matrix, mod):
     inv_matrix[1,0] *= -1
     det_inv = find_inverse(int(det(matrix)), mod)
     return (det_inv * inv_matrix) % mod
-
