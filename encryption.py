@@ -54,9 +54,6 @@ def affine_decrypt(K, L, m, table, mod=29):
     """The inverse operation of affine_encrypt: the paramaters have exactly the same
     meanings."""
 
-    # This is going to be quite involved as numpy doesn't do inverse in fields,
-    # don't really have time to do this for general n x n matrices so only works
-    # for simple 2x2 for now...
     K_inv = inverse_matrix(K, mod)
     decrypted_m = (np.dot(m, K_inv) - np.dot(L, K_inv)) % mod
     return convert_message(decrypted_m, table)
