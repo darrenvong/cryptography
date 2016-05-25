@@ -44,8 +44,14 @@ class testEncryption(unittest.TestCase):
 
     def test_inv_2x2(self):
         M = np.array([[5,5],[5,8]])
-        M_inv = encryption.inverse_2x2_matrix(M, 29)
+        M_inv = encryption.inverse_matrix(M, 29)
         expected = np.array([[16,19],[19,10]])
+        assert_equal(M_inv, expected)
+
+    def test_inv_3x3(self):
+        M = np.array([[1,2,3],[0,2,1],[0,3,4]])
+        M_inv = encryption.inverse_matrix(M, 7)
+        expected = np.array([[1,3,2],[0,5,4],[0,5,6]])
         assert_equal(M_inv, expected)
 
     def test_find_inverse(self):

@@ -8,7 +8,7 @@ written as another mean to consolidate understanding of the concepts in the math
 import itertools
 
 import numpy as np
-from numpy.linalg import det
+from sympy import Matrix as M
 
 """Standard alphanumeric conversion dictionaries (tables) for mod 26 and mod 29"""
 NUMS_TO_ALPHABET_MOD26 = ''.join([chr(i) for i in xrange(65,91)]) # 'A' starts at index 65 in ASCII in Python
@@ -57,22 +57,28 @@ def affine_decrypt(K, L, m, table, mod=29):
     # This is going to be quite involved as numpy doesn't do inverse in fields,
     # don't really have time to do this for general n x n matrices so only works
     # for simple 2x2 for now...
-    K_inv = inverse_2x2_matrix(K, mod)
+    K_inv = inverse_matrix(K, mod)
     decrypted_m = (np.dot(m, K_inv) - np.dot(L, K_inv)) % mod
     return convert_message(decrypted_m, table)
 
-def find_inverse(x, mod):
-    """Find the inverse of x in mod 'mod' - e.g. 3^-1 in F_31 is -10 or 21"""
+def find_inverse(x, m):
+    """Find the inverse of x in mod m - e.g. 3^-1 in F_31 is -10 or 21"""
     for i in itertools.count(start=1):
-        if (i * x) % mod == 0:
+        if (i * x) % m == 0:
             return -1
-        elif (i * x) % mod == 1:
+        elif (i * x) % m == 1:
             return i
 
-def inverse_2x2_matrix(matrix, mod):
-    inv_matrix = matrix.copy()
-    inv_matrix[0,0], inv_matrix[1,1] = inv_matrix[1,1], inv_matrix[0,0]
-    inv_matrix[0,1] *= -1
-    inv_matrix[1,0] *= -1
-    det_inv = find_inverse(int(det(matrix)), mod)
-    return (det_inv * inv_matrix) % mod
+def inverse_matrix(matrix, mod):
+    """Finds the inverse matrix over a certain modulus"""
+    # Uses a SymPy matrix to find inverse matrix since it returns it as
+    # a fraction rather than as a decimal representation 
+    matrix = M(matrix)
+    mat_inv = matrix**-1
+    nrow, ncol = mat_inv.shape
+    for i in xrange(nrow):
+        for j in xrange(ncol):
+            denom = mat_inv[i,j].q
+            denom_equiv = find_inverse(denom, mod)
+            mat_inv[i,j] = (mat_inv[i,j] * denom * denom_equiv) % mod
+    return np.array(mat_inv)
