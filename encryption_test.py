@@ -10,7 +10,8 @@ import numpy as np
 from numpy.testing import assert_equal
 
 import encryption
-from encryption import NUMS_TO_ALPHABET_MOD26, NUMS_TO_ALPHABET_MOD29
+from encryption import (NUMS_TO_ALPHABET_MOD26, NUMS_TO_ALPHABET_MOD29,
+                        ALPHABET_TO_NUMS_MOD26)
 
 class testEncryption(unittest.TestCase):
 
@@ -68,6 +69,78 @@ class testEncryption(unittest.TestCase):
         decrypted_text = encryption.affine_decrypt(K, L, M, NUMS_TO_ALPHABET_MOD29)
         expected = 'ST'
         self.assertEqual(decrypted_text, expected)
+
+    def test_convert_message(self):
+        msg = np.array([15,11,20,12])
+        converted_msg = encryption.convert_message(msg, NUMS_TO_ALPHABET_MOD26)
+        expected = 'PLUM'
+        self.assertEqual(converted_msg, expected)
+
+    def test_convert_message_reversed(self):
+        msg = 'PLUM'
+        converted_msg = encryption.convert_message(msg, ALPHABET_TO_NUMS_MOD26, True)
+        expected = np.array([15,11,20,12])
+        assert_equal(converted_msg, expected)
+
+    def test_vig_encrypt_even_len_msg(self):
+        k = 'PLUM'
+        m = np.array([18,4,11,11,0,11,11,14,20,17,18,7,0,17,4,18])
+        encrypted = encryption.vigenere_encrypt(k, m)
+        expected = 'HPFXPWFAJCMTPCYE'
+        self.assertEqual(encrypted, expected)
+
+    def test_vig_encrypt_odd_len_msg(self):
+        k = 'PLUM'
+        m = np.array([18,4,11,11,0,11,11])
+        encrypted = encryption.vigenere_encrypt(k, m)
+        expected = 'HPFXPWF'
+        self.assertEqual(encrypted, expected)
+
+    def test_vig_encrypt_key_with_space(self):
+        k = 'PL UM'
+        m = np.array([18,4,11,11,0])
+        encrypted = encryption.vigenere_encrypt(k, m)
+        expected = 'HPFXP'
+
+    def test_vig_decrypt_even_len_msg(self):
+        k = 'PLUM'
+        m = np.array([9,0,13,19,19,13,11,16,19,21])
+        decrypted = encryption.vigenere_decrypt(k, m)
+        expected = 'UPTHECREEK'
+        self.assertEqual(decrypted, expected)
+
+    def test_vig_decrypt_odd_len_msg(self):
+        k = 'PLUM'
+        m = np.array([9,0,13])
+        decrypted = encryption.vigenere_decrypt(k, m)
+        expected = 'UPT'
+        self.assertEqual(decrypted, expected)
+
+    def test_vig_decrypt_key_with_space(self):
+        k = 'PL U M'
+        m = np.array([9,0,13,19,19,13])
+        decrypted = encryption.vigenere_decrypt(k, m)
+        expected = 'UPTHEC'
+        self.assertEqual(decrypted, expected)
+
+    def test_one_time_pad_encrypt(self):
+        # This is effectively Vigenere encryption except key is a phrase rather
+        # than periodic text, hence Vigenere should still work for this
+        k = 'RERUM COGNOSCERE CAUSAS'
+        m = np.array([6,4,19,14,20,19,19,14,13,8,6,7,19])
+        encrypted = encryption.vigenere_encrypt(k, m)
+        expected = 'XIKIGVHUAWYJX'
+        self.assertEqual(encrypted, expected)
+
+    def test_one_time_pad_decrypt(self):
+        # Same reasoning in one_time_pad_encrypt applies for this
+        k = 'RERUM COGNOSCERE CAUSAS'
+        m = np.array([20,18,4,13,18,16,7,13,17,5,22])
+        decrypted = encryption.vigenere_decrypt(k, m)
+        expected = 'DONTGOTHERE'
+        self.assertEqual(decrypted, expected)
+
+    
 
 if __name__ == "__main__":
     unittest.main()
